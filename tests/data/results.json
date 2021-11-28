@@ -1,0 +1,325 @@
+{
+	"kics_version": "v1.4.8",
+	"files_scanned": 2,
+	"files_parsed": 2,
+	"files_failed_to_scan": 0,
+	"queries_total": 357,
+	"queries_failed_to_execute": 0,
+	"queries_failed_to_compute_similarity_id": 0,
+	"scan_id": "console",
+	"severity_counters": {
+		"HIGH": 1,
+		"INFO": 0,
+		"LOW": 6,
+		"MEDIUM": 6,
+		"TRACE": 0
+	},
+	"total_counter": 13,
+	"total_bom_resources": 0,
+	"start": "2021-11-28T21:41:10.7591468Z",
+	"end": "2021-11-28T21:41:15.9133412Z",
+	"paths": [
+		"/path"
+	],
+	"queries": [
+		{
+			"query_name": "Passwords And Secrets - Generic Password",
+			"query_id": "487f4be7-3fd9-4506-a07a-eae252180c08",
+			"query_url": "https://kics.io/",
+			"severity": "HIGH",
+			"platform": "Common",
+			"category": "Secret Management",
+			"description": "Query to find passwords and secrets in infrastructure code.",
+			"description_id": "d69d8a89",
+			"files": [
+				{
+					"file_name": "../../path/ansible_play.yaml",
+					"similarity_id": "40f358a728671d2b010d49fd41e6edf873e871012a6e57ccb33a08030d1b4151",
+					"line": 5,
+					"issue_type": "RedundantAttribute",
+					"search_key": "",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "Hardcoded secret key should not appear in source",
+					"actual_value": "'      password: aurbnefdb' contains a secret"
+				}
+			]
+		},
+		{
+			"query_name": "CPU Limits Not Set",
+			"query_id": "4ac0e2b7-d2d2-4af7-8799-e8de6721ccda",
+			"query_url": "https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+			"severity": "MEDIUM",
+			"platform": "Kubernetes",
+			"category": "Resource Management",
+			"description": "CPU limits should be set because if the system has CPU time free, a container is guaranteed to be allocated as much CPU as it requests",
+			"description_id": "9a2ef763",
+			"files": [
+				{
+					"file_name": "../../path/kubernetes_deployment.yaml",
+					"similarity_id": "0b8330ee4580e4b4b3ff82d6218b9db164a88b37a6818e445d57112d7322927b",
+					"line": 19,
+					"issue_type": "MissingAttribute",
+					"search_key": "metadata.name={{nginx-deployment}}.spec.template.spec.containers.name=nginx",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "spec.template.spec.containers.name=nginx has resources defined",
+					"actual_value": "spec.template.spec.containers.name=nginx doesn't have resources defined"
+				}
+			]
+		},
+		{
+			"query_name": "CPU Requests Not Set",
+			"query_id": "ca469dd4-c736-448f-8ac1-30a642705e0a",
+			"query_url": "https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#",
+			"severity": "MEDIUM",
+			"platform": "Kubernetes",
+			"category": "Resource Management",
+			"description": "CPU requests should be set to ensure the sum of the resource requests of the scheduled Containers is less than the capacity of the node",
+			"description_id": "ac7ad5df",
+			"files": [
+				{
+					"file_name": "../../path/kubernetes_deployment.yaml",
+					"similarity_id": "55b5014daf29b7e3c50361b0d866f949b2042aca73426309c30f4ae3e4abb595",
+					"line": 19,
+					"issue_type": "MissingAttribute",
+					"search_key": "metadata.name={{nginx-deployment}}.spec.template.spec.containers.name=nginx",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "spec.template.spec.containers.name=nginx does have resources defined",
+					"actual_value": "spec.template.spec.containers.name=nginx doesn't have resources defined"
+				}
+			]
+		},
+		{
+			"query_name": "Liveness Probe Is Not Defined",
+			"query_id": "ade74944-a674-4e00-859e-c6eab5bde441",
+			"query_url": "https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-tcp-liveness-probe",
+			"severity": "MEDIUM",
+			"platform": "Kubernetes",
+			"category": "Availability",
+			"description": "Liveness Probe must be defined.",
+			"description_id": "f724fa60",
+			"files": [
+				{
+					"file_name": "../../path/kubernetes_deployment.yaml",
+					"similarity_id": "0969ac3ff491c9258cab6c5bd79cb1c595636ff2e8b91e7c182bfb94c3321bd9",
+					"line": 19,
+					"issue_type": "MissingAttribute",
+					"search_key": "metadata.name={{nginx-deployment}}.spec.template.spec.containers.name={{nginx}}",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "metadata.name={{nginx-deployment}}.spec.containers.name={{nginx}}.livenessProbe is defined",
+					"actual_value": "metadata.name={{nginx-deployment}}.spec.containers.name={{nginx}}.livenessProbe is undefined"
+				}
+			]
+		},
+		{
+			"query_name": "Seccomp Profile Is Not Configured",
+			"query_id": "f377b83e-bd07-4f48-a591-60c82b14a78b",
+			"query_url": "https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp",
+			"severity": "MEDIUM",
+			"platform": "Kubernetes",
+			"category": "Insecure Configurations",
+			"description": "Check if any resource does not configure Seccomp default profile properly",
+			"description_id": "d943c7e7",
+			"files": [
+				{
+					"file_name": "../../path/kubernetes_deployment.yaml",
+					"similarity_id": "45a2b2ad2d87fb2ae1bf7905b41432ae010a27f747ae91add9af2a0962061303",
+					"line": 14,
+					"issue_type": "MissingAttribute",
+					"search_key": "metadata.name={{nginx-deployment}}.spec.template.metadata",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "'spec.template.metadata.annotations' is set",
+					"actual_value": "'spec.template.metadata.annotations' is undefined"
+				}
+			]
+		},
+		{
+			"query_name": "Service Account Token Automount Not Disabled",
+			"query_id": "48471392-d4d0-47c0-b135-cdec95eb3eef",
+			"query_url": "https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-the-default-service-account-to-access-the-api-server",
+			"severity": "MEDIUM",
+			"platform": "Kubernetes",
+			"category": "Insecure Defaults",
+			"description": "Service Account Tokens are automatically mounted even if not necessary",
+			"description_id": "51cade0f",
+			"files": [
+				{
+					"file_name": "../../path/kubernetes_deployment.yaml",
+					"similarity_id": "db249ff46357f9dc57f66813d763b01bdac337e7e8b60b0f845898f5d9acf1f4",
+					"line": 17,
+					"issue_type": "MissingAttribute",
+					"search_key": "metadata.name={{nginx-deployment}}.spec.template.spec",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "'spec.template.spec.automountServiceAccountToken' is false",
+					"actual_value": "'spec.template.spec.automountServiceAccountToken' is undefined"
+				}
+			]
+		},
+		{
+			"query_name": "Using Unrecommended Namespace",
+			"query_id": "611ab018-c4aa-4ba2-b0f6-a448337509a6",
+			"query_url": "https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/",
+			"severity": "MEDIUM",
+			"platform": "Kubernetes",
+			"category": "Insecure Configurations",
+			"description": "Namespaces like 'default', 'kube-system' or 'kube-public' should not be used",
+			"description_id": "29549ea9",
+			"files": [
+				{
+					"file_name": "../../path/kubernetes_deployment.yaml",
+					"similarity_id": "c430ee8d642018d59a5ce758164983b2b97165b5805fa1094de311e0a041f402",
+					"line": 5,
+					"issue_type": "MissingAttribute",
+					"search_key": "kind={{Deployment}}.metadata.name={{nginx-deployment}}",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "metadata.namespace is defined and not null",
+					"actual_value": "metadata.namespace is undefined or null"
+				}
+			]
+		},
+		{
+			"query_name": "Deployment Has No PodAntiAffinity",
+			"query_id": "a31b7b82-d994-48c4-bd21-3bab6c31827a",
+			"query_url": "https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/",
+			"severity": "LOW",
+			"platform": "Kubernetes",
+			"category": "Resource Management",
+			"description": "Check if Deployment resources don't have a podAntiAffinity policy, which prevents multiple pods from being scheduled on the same node.",
+			"description_id": "22146f41",
+			"files": [
+				{
+					"file_name": "../../path/kubernetes_deployment.yaml",
+					"similarity_id": "d306d0ee0804d1a7a088178fd34f0b0488618d7ae9071f23a9d999fcac401841",
+					"line": 17,
+					"issue_type": "MissingAttribute",
+					"search_key": "metadata.name={{nginx-deployment}}.spec.template.spec",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "'spec.template.spec.affinity' is set",
+					"actual_value": "'spec.template.spec.affinity' is undefined"
+				}
+			]
+		},
+		{
+			"query_name": "Deployment Without PodDisruptionBudget",
+			"query_id": "b23e9b98-0cb6-4fc9-b257-1f3270442678",
+			"query_url": "https://kubernetes.io/docs/tasks/run-application/configure-pdb/",
+			"severity": "LOW",
+			"platform": "Kubernetes",
+			"category": "Availability",
+			"description": "Deployments should be assigned with a PodDisruptionBudget to ensure high availability",
+			"description_id": "df941cb9",
+			"files": [
+				{
+					"file_name": "../../path/kubernetes_deployment.yaml",
+					"similarity_id": "b1bbd9dc14f480e3ce99757850535c350a832d04240c6f8f3d76cc58695a8913",
+					"line": 11,
+					"issue_type": "MissingAttribute",
+					"search_key": "metadata.name={{nginx-deployment}}.spec.selector.matchLabels",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "metadata.name=nginx-deployment is targeted by a PodDisruptionBudget",
+					"actual_value": "metadata.name=nginx-deployment is not targeted by a PodDisruptionBudget"
+				}
+			]
+		},
+		{
+			"query_name": "No Drop Capabilities for Containers",
+			"query_id": "268ca686-7fb7-4ae9-b129-955a2a89064e",
+			"query_url": "https://kubernetes.io/docs/concepts/workloads/pods/init-containers/",
+			"severity": "LOW",
+			"platform": "Kubernetes",
+			"category": "Best Practices",
+			"description": "Sees if Kubernetes Drop Capabilities exists to ensure containers security context",
+			"description_id": "9d3ca6db",
+			"files": [
+				{
+					"file_name": "../../path/kubernetes_deployment.yaml",
+					"similarity_id": "3768a8835faf09c16a0fdb6473c905e1b4d79f23c257ff8f7a60f5a3e03d4048",
+					"line": 19,
+					"issue_type": "MissingAttribute",
+					"search_key": "metadata.name={{nginx-deployment}}.spec.containers.name=nginx",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "metadata.name={{nginx-deployment}}.spec.containers.name=nginx.securityContext is set",
+					"actual_value": "metadata.name={{nginx-deployment}}.spec.containers.name=nginx.securityContext is undefined"
+				}
+			]
+		},
+		{
+			"query_name": "Pod or Container Without LimitRange",
+			"query_id": "4a20ebac-1060-4c81-95d1-1f7f620e983b",
+			"query_url": "https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/cpu-constraint-namespace/#create-a-limitrange-and-a-pod",
+			"severity": "LOW",
+			"platform": "Kubernetes",
+			"category": "Insecure Configurations",
+			"description": "Pod or Container should have a LimitRange associated",
+			"description_id": "142ed21f",
+			"files": [
+				{
+					"file_name": "../../path/kubernetes_deployment.yaml",
+					"similarity_id": "1685b227e42f660a2ae8d4edecaf5acea027cd16f101bb95b7868d6fd4abfd68",
+					"line": 5,
+					"issue_type": "MissingAttribute",
+					"search_key": "metadata.name={{nginx-deployment}}",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "metadata.name={{nginx-deployment}} has a 'LimitRange' associated",
+					"actual_value": "metadata.name={{nginx-deployment}} does not have a 'LimitRange' associated"
+				}
+			]
+		},
+		{
+			"query_name": "Pod or Container Without ResourceQuota",
+			"query_id": "48a5beba-e4c0-4584-a2aa-e6894e4cf424",
+			"query_url": "https://kubernetes.io/docs/concepts/policy/resource-quotas/",
+			"severity": "LOW",
+			"platform": "Kubernetes",
+			"category": "Insecure Configurations",
+			"description": "Pod or Container should have a ResourceQuota associated",
+			"description_id": "86499ed5",
+			"files": [
+				{
+					"file_name": "../../path/kubernetes_deployment.yaml",
+					"similarity_id": "43e4c9bb2f5882f38572325842eaef5062f2ca74bfcfbf40930dc199a1aa7ea6",
+					"line": 5,
+					"issue_type": "MissingAttribute",
+					"search_key": "metadata.name={{nginx-deployment}}",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "metadata.name={{nginx-deployment}} has a 'ResourceQuota' associated",
+					"actual_value": "metadata.name={{nginx-deployment}} does not have a 'ResourceQuota' associated"
+				}
+			]
+		},
+		{
+			"query_name": "Pod or Container Without Security Context",
+			"query_id": "a97a340a-0063-418e-b3a1-3028941d0995",
+			"query_url": "https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
+			"severity": "LOW",
+			"platform": "Kubernetes",
+			"category": "Insecure Configurations",
+			"description": "A security context defines privilege and access control settings for a Pod or Container",
+			"description_id": "68a1650b",
+			"files": [
+				{
+					"file_name": "../../path/kubernetes_deployment.yaml",
+					"similarity_id": "826736595fda6190f0274e610eb906c11f00173bf59ca6df8d55295f3d8ed186",
+					"line": 19,
+					"issue_type": "MissingAttribute",
+					"search_key": "metadata.name={{nginx-deployment}}.spec.template.spec.containers.name=nginx",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "spec.template.spec.containers.name=nginx has a security context",
+					"actual_value": "spec.template.spec.containers.name=nginx does not have a security context"
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,4 @@
+# ignore:
+# E501 file too long
+[flake8]
+ignore = E501 
