@@ -27,7 +27,7 @@ class Kics(Okland):
         execute a scan and work with its results
 
     dir: string
-        directory to scan; we assume the path is 
+        directory to scan; we assume the path is
 
     debug: bool
         print debug output.
@@ -141,7 +141,7 @@ class Kics(Okland):
                     super(Kics, self).__toConsole__(message=rslt)
 
 
-    def send(self, pushgateway="localhost:9091", jobname="Kics"):
+    def send(self, pushgateway="localhost:9091", jobname="Kics", simulate=False):
         """
         send an extracted collection of metrics over to a prometheus pushgateway
 
@@ -149,8 +149,13 @@ class Kics(Okland):
         ----------
         pushgateway: string
             Endpoint of a prometheus pushgateway, e.g. my-pushgateway.cluster.local:9091
+
+        simulate: bool
+            just output the prometheus metrics to stdout and exit.
+
         jobname: string
             Jobname for metrics to be identified in pushgateway
+
 
         """
         self.__loadResult__()
@@ -180,12 +185,15 @@ class Kics(Okland):
             kq.labels(rslt['query_name'].replace(' ', '_').replace('-', '_')[:63].lower(), rslt['severity'].lower(), rslt['platform']).set(len(rslt['query_name']))
 
         # print content to stdout also
-        if self.__dbg__:
+        if self.__dbg__ or simulate:
             tmpFile = os.path.join(os.getcwd(), "%s.prom" % (uuid.uuid4().hex))
             write_to_textfile(tmpFile, registry)
             with open(tmpFile, 'r') as f:
                 print(f.read())
             os.remove(tmpFile)
+        if simulate:
+          super(Kics, self).__toConsole__("Simulation Mode. Exiting now.")
+          sys.exit(0)
 
         try:
             push_to_gateway("{}".format(pushgateway), job="kics_{}".format(jobname), registry=registry)
