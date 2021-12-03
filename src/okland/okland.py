@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from pkg import *
+from generics import *
+from kics import *
 import fire
 
 if __name__ == '__main__':

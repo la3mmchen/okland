@@ -6,7 +6,7 @@ import json
 import shlex
 import uuid
 import docker
-from .generics import Okland
+from generics import Okland
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway, write_to_textfile
 
 
