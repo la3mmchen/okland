@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from .generics import *
-from .kics import *
+from utils.generics import *
+from utils.kics import *
 import fire
 
 def main():
@@ -16,4 +16,7 @@ def main():
     })
   
 if __name__ == '__main__':
+    """
+    okland
+    """
     main()
