@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from utils.generics import *
-from utils.kics import *
+from okland.generics import *
+from okland.kics import *
 import fire
 
 def main():
