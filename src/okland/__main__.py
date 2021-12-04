@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-from generics import *
-from kics import *
+from .generics import *
+from .kics import *
 import fire
 
-if __name__ == '__main__':
+def main():
     """
     handle resulsts from static code analysis toolings. 
     
@@ -14,3 +14,6 @@ if __name__ == '__main__':
     fire.Fire({
       'kics': Kics,
     })
+  
+if __name__ == '__main__':
+    main()
