@@ -12,11 +12,11 @@ from prometheus_client import CollectorRegistry, Gauge, push_to_gateway, write_t
 
 class Kics(Okland):
     """
-    commands for source kics.io
+    subcommands for source kics.io
 
     wrapper for dealing with static code analysis from kics.io. 
 
-    okland can either parse a pregenerated results file or execute a scan on the fly.
+    okland can either parse a pregenerated results file or execute a kics scan on the fly.
 
     Parameters
     ----------
@@ -27,10 +27,10 @@ class Kics(Okland):
         execute a scan and work with its results
 
     dir: string
-        directory to scan; we assume the path is
+        directory to scan
 
     debug: bool
-        print debug output.
+        print some debug output
 
     """
     __fileLocation__ = None
