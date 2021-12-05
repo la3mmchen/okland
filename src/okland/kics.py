@@ -192,9 +192,9 @@ class Kics(Okland):
             ks.labels(self.__repoName__, sev.lower()).set(self.__content__['severity_counters'][sev])
 
         # scan detail
-        kq = Gauge(f"{metricprefix}_query", 'Numbers of files matched this query.', ['name', 'severity', 'platform'], registry=registry)
+        kq = Gauge(f"{metricprefix}_query", 'Numbers of files matched this query.', ['name', 'severity', 'platform', 'repo'], registry=registry)
         for rslt in self.__content__['queries']:
-            kq.labels(rslt['query_name'].replace(' ', '_').replace('-', '_')[:63].lower(), rslt['severity'].lower(), rslt['platform']).set(len(rslt['query_name']))
+            kq.labels(rslt['query_name'].replace(' ', '_').replace('-', '_')[:63].lower(), rslt['severity'].lower(), rslt['platform'], self.__repoName__).set(len(rslt['query_name']))
 
         # print content to stdout also
         if self.__dbg__ or simulate:
