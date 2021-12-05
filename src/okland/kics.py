@@ -20,7 +20,7 @@ class Kics(Okland):
 
     Parameters
     ----------
-    results: string
+    results: stringg
         existing file results.json. if given no scan is executed
 
     scan: bool
@@ -38,12 +38,15 @@ class Kics(Okland):
     __dbg__ = False
     __scan__ = False
     __scanDir__ = None
-
+    __repoName__ = None
+        
     def __init__(self, results="results.json", debug=False, scan=False, dir=os.getcwd()):
         if not os.path.isabs(results):
             self.__fileLocation__ = os.path.join(os.getcwd(), results)
         else:
             self.__fileLocation__ = results
+
+        self.__repoName__ = os.path.basename(os.getcwd())
         self.__dbg__ = debug
         self.__scan__ = scan
         if not os.path.isabs(dir):
@@ -53,7 +56,8 @@ class Kics(Okland):
 
     def __loadResult__(self):
         if self.__scan__:
-            super(Kics, self).__toConsole__(message="Executing kics scan.", style="yellow")
+            self.__repoName__ = os.path.basename(self.__scanDir__)
+            super(Kics, self).__toConsole__(message=f"Executing kics scan for {self.__repoName__}.", style="yellow")
             self.__doScan__()
             self.__fileLocation__ = os.path.join(self.__scanDir__, "results.json")
 
@@ -61,7 +65,7 @@ class Kics(Okland):
             with open(self.__fileLocation__) as json_file:
                 self.__content__ = json.load(json_file)
         except Exception as e:
-            super(Kics, self).__toConsole__("Error while parsing (%s). %s" % (self.__fileLocation__, e))
+            super(Kics, self).__toConsole__("Error while parsing (%s). %s" % (self.__fileLocation__, e), style="red")
             sys.exit(1)
 
     def __doScan__(self, dir=os.getcwd()):
@@ -88,13 +92,11 @@ class Kics(Okland):
         except docker.errors.ContainerError as e:
             pass
         except Exception as e:
-            super(Kics, self).__toConsole__("Error while running kics via docker.\ncmd would have been: (%s).\n%s" % (shlex.join(cmd), e))
+            super(Kics, self).__toConsole__("Error while running kics via docker.\ncmd would have been: (%s).\n%s" % (shlex.join(cmd), e), style="red")
 
     def summary(self, style="white"):
         """
         print a high level summary
-
-
         """
         self.__loadResult__()
         super(Kics, self).__toConsole__(message="Scan summery: ", style=style)
@@ -116,6 +118,12 @@ class Kics(Okland):
     def filter(self, severity="high"):
         """
         filter findings by their state (e.g. high).
+
+        Parameters
+        ----------
+        severity: string
+            Only show findings with this severity. (e.g --severity=MEDIUM)
+        
         """
         self.__loadResult__()
         super(Kics, self).__toConsole__(message="Issues details, filtered for severity (%s): " % severity, style="white")
@@ -141,7 +149,7 @@ class Kics(Okland):
                     super(Kics, self).__toConsole__(message=rslt)
 
 
-    def send(self, pushgateway="localhost:9091", jobname="Kics", simulate=False):
+    def send(self, pushgateway="localhost:9091", jobname="Kics", simulate=False, metricprefix="okland_kics"):
         """
         send an extracted collection of metrics over to a prometheus pushgateway
 
@@ -156,12 +164,16 @@ class Kics(Okland):
         jobname: string
             Jobname for metrics to be identified in pushgateway
 
+        metricprefix: string
+            Prefix for all metrics.
 
         """
         self.__loadResult__()
         registry = CollectorRegistry()
-        repo = os.path.basename(os.getcwd())
 
+        if metricprefix[-1] == '_':
+            metricprefix = metricprefix[:-1]
+        
         # collect scan meta data
         meta_data = {
             'files_scanned': {'value': self.__content__['files_scanned'], 'help': 'Number of files scanned'},
@@ -172,15 +184,15 @@ class Kics(Okland):
         }
 
         for k, v in meta_data.items():
-            Gauge('kics_{}'.format(k), 'Number of {}.'.format(v['help']), ['repo'], registry=registry).labels(repo).set(v['value'])
+            Gauge(f"{metricprefix}_{k}", f"Number of {v['help']}", ['repo'], registry=registry).labels(self.__repoName__).set(v['value'])
 
         # collect scan summary
-        ks = Gauge('kics_severity_counter', 'Number of vulns for severity.', ['repo', 'severity'], registry=registry)
+        ks = Gauge(f"{metricprefix}_counter", 'Number of vulns for severity.', ['repo', 'severity'], registry=registry)
         for sev in self.__content__['severity_counters']:
-            ks.labels(repo, sev.lower()).set(self.__content__['severity_counters'][sev])
+            ks.labels(self.__repoName__, sev.lower()).set(self.__content__['severity_counters'][sev])
 
         # scan detail
-        kq = Gauge('kics_query', 'Numbers of files matched this query.', ['name', 'severity', 'platform'], registry=registry)
+        kq = Gauge(f"{metricprefix}_query", 'Numbers of files matched this query.', ['name', 'severity', 'platform'], registry=registry)
         for rslt in self.__content__['queries']:
             kq.labels(rslt['query_name'].replace(' ', '_').replace('-', '_')[:63].lower(), rslt['severity'].lower(), rslt['platform']).set(len(rslt['query_name']))
 
@@ -194,8 +206,7 @@ class Kics(Okland):
         if simulate:
           super(Kics, self).__toConsole__("Simulation Mode. Exiting now.")
           sys.exit(0)
-
         try:
-            push_to_gateway("{}".format(pushgateway), job="kics_{}".format(jobname), registry=registry)
+            push_to_gateway("http://{}".format(pushgateway), job=jobname, registry=registry)
         except Exception as e:
-            super(Kics, self).__toConsole__("Error while sending data to configured pushgateway (%s). %s" % (pushgateway, e))
+            super(Kics, self).__toConsole__("Error while sending data to configured pushgateway (http://%s). %s" % (pushgateway, e), style="red")
