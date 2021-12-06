@@ -14,7 +14,7 @@ class Kics(Okland):
     """
     subcommands for source kics.io
 
-    wrapper for dealing with static code analysis from kics.io. 
+    wrapper for dealing with static code analysis from kics.io.
 
     okland can either parse a pregenerated results file or execute a kics scan on the fly.
 
@@ -39,7 +39,7 @@ class Kics(Okland):
     __scan__ = False
     __scanDir__ = None
     __repoName__ = None
-        
+
     def __init__(self, results="results.json", debug=False, scan=False, dir=os.getcwd()):
         if not os.path.isabs(results):
             self.__fileLocation__ = os.path.join(os.getcwd(), results)
@@ -50,8 +50,8 @@ class Kics(Okland):
         self.__dbg__ = debug
         self.__scan__ = scan
         if not os.path.isabs(dir):
-          self.__scanDir__ = os.path.join(os.getcwd(), dir)
-        else:  
+            self.__scanDir__ = os.path.join(os.getcwd(), dir)
+        else:
             self.__scanDir__ = dir
 
     def __loadResult__(self):
@@ -82,14 +82,14 @@ class Kics(Okland):
             '--ignore-on-exit',
             'results'
         ]
-        
+
         repository = 'checkmarx/kics'
         tag = 'latest'
         try:
             client = docker.from_env()
             client.images.pull(repository=repository, tag=tag)
             client.containers.run(image=("%s:%s" % (repository, tag)), command=cmd, remove=True, volumes=['{}:/path'.format(self.__scanDir__)], tty=True, stdout=True)
-        except docker.errors.ContainerError as e:
+        except docker.errors.ContainerError:
             pass
         except Exception as e:
             super(Kics, self).__toConsole__("Error while running kics via docker.\ncmd would have been: (%s).\n%s" % (shlex.join(cmd), e), style="red")
@@ -99,7 +99,7 @@ class Kics(Okland):
         print a high level summary
         """
         self.__loadResult__()
-        super(Kics, self).__toConsole__(message="Scan summery: ", style=style)
+        super(Kics, self).__toConsole__(message="Scan summary: ", style=style)
         for sev in self.__content__['severity_counters']:
             consolestyle = style
             if self.__content__['severity_counters'][sev] > 10:
@@ -115,7 +115,7 @@ class Kics(Okland):
         super(Kics, self).__toConsole__(message=("Scanned files %s" % self.__content__['files_scanned']), style=consolestyle)
         super(Kics, self).__toConsole__(message=("Queries %s" % self.__content__['queries_total']), style=consolestyle)
 
-    def filter(self, severity="high"):
+    def filter(self, severity="all", detail=False):
         """
         filter findings by their state (e.g. high).
 
@@ -123,15 +123,26 @@ class Kics(Okland):
         ----------
         severity: string
             Only show findings with this severity. (e.g --severity=MEDIUM)
-        
+
+        detail: bool
+            Set to True to see lot more output
+
         """
         self.__loadResult__()
         super(Kics, self).__toConsole__(message="Issues details, filtered for severity (%s): " % severity, style="white")
         count = 0
         for rslt in self.__content__['queries']:
-            if rslt['severity'].lower() == severity.lower():
+            if severity == "all" or rslt['severity'].lower() == severity.lower():
                 count += 1
-                rslt.pop('files', None)
+
+                # drop additional details
+                if not detail:
+                    rslt.pop('files', None)
+
+                # shorten addtional details
+                if detail:
+                    pass
+
                 rslt.pop('description_id', None)
                 super(Kics, self).__toConsole__(message=rslt)
         super(Kics, self).__toConsole__(message="Shown %s of %s issues: " % (count, len(self.__content__['queries'])), style="white")
@@ -147,7 +158,6 @@ class Kics(Okland):
             for rslt in self.__content__['queries']:
                 if rslt['query_id'] == id:
                     super(Kics, self).__toConsole__(message=rslt)
-
 
     def send(self, pushgateway="localhost:9091", jobname="Kics", simulate=False, metricprefix="okland_kics"):
         """
@@ -173,7 +183,7 @@ class Kics(Okland):
 
         if metricprefix[-1] == '_':
             metricprefix = metricprefix[:-1]
-        
+
         # collect scan meta data
         meta_data = {
             'files_scanned': {'value': self.__content__['files_scanned'], 'help': 'Number of files scanned'},
@@ -204,8 +214,8 @@ class Kics(Okland):
                 print(f.read())
             os.remove(tmpFile)
         if simulate:
-          super(Kics, self).__toConsole__("Simulation Mode. Exiting now.")
-          sys.exit(0)
+            super(Kics, self).__toConsole__("Simulation Mode. Exiting now.")
+            sys.exit(0)
         try:
             push_to_gateway("http://{}".format(pushgateway), job=jobname, registry=registry)
         except Exception as e:

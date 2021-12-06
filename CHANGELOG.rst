@@ -2,8 +2,13 @@
 Changelog
 =========
 
-Version 1.0
+Version 0.0.6
 ===========
 
-- Version with kics.io subcommand
-- Setup with proper build structure
+- subcommand `filter` has "all" as new default value
+- additional flag `--detail` to see more output from subdcommand `filter`
+
+Version 0.0.5 and before
+===========
+
+- add kics.io subprovider
